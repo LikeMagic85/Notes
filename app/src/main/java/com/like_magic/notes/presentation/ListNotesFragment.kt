@@ -1,4 +1,4 @@
-package com.like_magic.notes
+package com.like_magic.notes.presentation
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -22,6 +22,13 @@ class ListNotesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupFab()
+    }
+
+    private fun setupFab(){
+        binding.addNoteFab.setOnClickListener {
+
+        }
     }
 
     companion object {

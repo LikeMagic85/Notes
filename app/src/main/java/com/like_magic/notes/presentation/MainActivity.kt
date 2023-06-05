@@ -1,7 +1,8 @@
-package com.like_magic.notes
+package com.like_magic.notes.presentation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.like_magic.notes.R
 import com.like_magic.notes.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
