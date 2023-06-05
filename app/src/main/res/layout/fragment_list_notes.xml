@@ -22,6 +22,7 @@
         android:id="@+id/notes_rv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintTop_toBottomOf="@id/title"
         tools:listitem="@layout/item_notes_list"/>
 
