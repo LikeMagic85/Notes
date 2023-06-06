@@ -23,7 +23,7 @@ class NotesRepositoryImpl(application: Application) : NotesRepository {
 
     }
 
-    override fun addNote(noteEntity: NoteEntity) {
+    override fun insertNote(noteEntity: NoteEntity) {
         Completable.fromCallable {
             notesDao.insertNote(mapper.mapEntityToDbModel(noteEntity))
         }.subscribeOn(Schedulers.io()).subscribe()
@@ -37,7 +37,4 @@ class NotesRepositoryImpl(application: Application) : NotesRepository {
         TODO("Not yet implemented")
     }
 
-    override fun editNote(noteEntity: NoteEntity) {
-        TODO("Not yet implemented")
-    }
 }

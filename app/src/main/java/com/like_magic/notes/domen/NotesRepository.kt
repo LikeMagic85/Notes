@@ -6,9 +6,8 @@ import io.reactivex.Observable
 interface NotesRepository {
 
     fun getNotesList(): Observable<List<NoteEntity>>
-    fun addNote(noteEntity: NoteEntity)
+    fun insertNote(noteEntity: NoteEntity)
     fun getNote(noteEntity: NoteEntity):NoteEntity
     fun deleteNote(noteId:Int)
-    fun editNote(noteEntity: NoteEntity)
 
 }

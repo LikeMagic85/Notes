@@ -20,6 +20,7 @@
             android:layout_height="?attr/actionBarSize"
             app:navigationIcon="@drawable/arrow_back_icon"
             app:title="@string/app_name"
+            app:menu="@menu/app_bar_menu"
             />
 
     </com.google.android.material.appbar.AppBarLayout>

@@ -12,13 +12,13 @@ import com.like_magic.notes.presentation.NoteFragment.Companion.MODE_EDIT
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 
-class ListNotesFragment : MvpAppCompatFragment(), ListNotesView {
+class ListNotesFragment : MvpAppCompatFragment(), AppViews.ListNotesView {
 
     private var _binding:FragmentListNotesBinding? = null
     private val binding:FragmentListNotesBinding
         get() = _binding ?: throw RuntimeException("FragmentListNotesBinding is null")
     private val presenter by moxyPresenter {
-        MainPresenter(requireActivity().application)
+        ListNotesPresenter(requireActivity().application)
     }
     private val notesAdapter = ListNotesAdapter()
 
@@ -44,22 +44,22 @@ class ListNotesFragment : MvpAppCompatFragment(), ListNotesView {
 
     private fun setupFab(){
         binding.addNoteFab.setOnClickListener {
-            requireActivity().supportFragmentManager
-                .beginTransaction()
-                .addToBackStack(null)
-                .add(R.id.main_container, NoteFragment.newInstance(MODE_ADD))
-                .commit()
+            launchNoteFragment(MODE_ADD)
         }
     }
 
     private fun setupItemListener(){
         notesAdapter.onNoteClickListener = {note->
-            requireActivity().supportFragmentManager
-                .beginTransaction()
-                .addToBackStack(null)
-                .add(R.id.main_container, NoteFragment.newInstance(MODE_EDIT, note))
-                .commit()
+            launchNoteFragment(MODE_EDIT, note)
         }
+    }
+
+    private fun launchNoteFragment(mode:String, note:NoteEntity? = null){
+        requireActivity().supportFragmentManager
+            .beginTransaction()
+            .addToBackStack(null)
+            .add(R.id.main_container, NoteFragment.newInstance(mode, note))
+            .commit()
     }
 
     override fun onDestroyView() {

@@ -7,7 +7,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import moxy.MvpPresenter
 
-class MainPresenter(application: Application):MvpPresenter<ListNotesView>() {
+class ListNotesPresenter(application: Application):MvpPresenter<AppViews.ListNotesView>() {
 
     private val repository = NotesRepositoryImpl(application)
 
@@ -23,7 +23,6 @@ class MainPresenter(application: Application):MvpPresenter<ListNotesView>() {
             }
         compositeDisposable.add(disposable)
     }
-
 
 }
 

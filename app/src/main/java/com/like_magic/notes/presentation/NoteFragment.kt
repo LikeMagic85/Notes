@@ -4,16 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.like_magic.notes.data.NotesRepositoryImpl
 import com.like_magic.notes.databinding.FragmentNoteBinding
 import com.like_magic.notes.domen.entity.NoteEntity
 import moxy.MvpAppCompatFragment
+import moxy.ktx.moxyPresenter
 
-class NoteFragment : MvpAppCompatFragment() {
+class NoteFragment : MvpAppCompatFragment(), AppViews.NoteView {
 
     private var _binding: FragmentNoteBinding? = null
     private val binding: FragmentNoteBinding
         get() = _binding ?: throw RuntimeException("FragmentNoteBinding is null")
+    private val presenter by moxyPresenter { NotePresenter(requireActivity().application) }
 
 
     override fun onCreateView(
@@ -27,20 +28,14 @@ class NoteFragment : MvpAppCompatFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val args = parseArgs()
-        setRightScreenMode(args.first, args.second)
+        presenter.setScreenMode(args.first, args.second)
         setupAppBar(args.first, args.second)
     }
 
-    private fun setRightScreenMode(mode: String, note: NoteEntity?) {
+    override  fun setRightScreenMode(mode: String, note: NoteEntity?) {
         when (mode) {
-            MODE_ADD -> {
-                addMode()
-            }
-
-            MODE_EDIT -> {
-                editMode(note)
-            }
-
+            MODE_ADD -> {addMode()}
+            MODE_EDIT -> {editMode(note)}
             else -> {
                 throw RuntimeException("unknown screen mode")
             }
@@ -56,7 +51,7 @@ class NoteFragment : MvpAppCompatFragment() {
                 description = binding.descriptionTextInput.text.toString()
             )
             newNote?.let { note ->
-                NotesRepositoryImpl(requireActivity().application).addNote(note)
+                presenter.insertNote(note)
             }
             requireActivity().supportFragmentManager.popBackStack()
         }
@@ -71,7 +66,7 @@ class NoteFragment : MvpAppCompatFragment() {
                 time = "14:00",
                 id = 0
             )
-            NotesRepositoryImpl(requireActivity().application).addNote(newNote)
+            presenter.insertNote(newNote)
             requireActivity().supportFragmentManager.popBackStack()
         }
     }
@@ -81,7 +76,6 @@ class NoteFragment : MvpAppCompatFragment() {
             MODE_ADD -> {
                 binding.topAppBar.title = "Add new note"
             }
-
             MODE_EDIT -> {
                 binding.topAppBar.title = "Edit note id: ${note?.id.toString()}"
             }

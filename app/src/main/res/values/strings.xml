@@ -6,4 +6,5 @@
     <string name="note_title_hint_text">Title</string>
     <string name="note_description_hint_text">Description</string>
     <string name="save_note_btn_text">Save note</string>
+    <string name="delete_note_text">Delete note</string>
 </resources>
