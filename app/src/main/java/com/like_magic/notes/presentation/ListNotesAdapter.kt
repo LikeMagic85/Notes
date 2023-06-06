@@ -7,11 +7,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.like_magic.notes.databinding.ItemNotesListBinding
 import com.like_magic.notes.domen.entity.NoteEntity
 
-class ListNotesAdapter :
+class ListNotesAdapter() :
     ListAdapter<NoteEntity, ListNotesAdapter.NoteViewHolder>(NoteDiffCallback()) {
 
 
-    var onCoinClickListener: ((NoteEntity) -> Unit)? = null
+    var onNoteClickListener: ((NoteEntity) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         val binding = ItemNotesListBinding.inflate(
@@ -24,11 +24,13 @@ class ListNotesAdapter :
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
         val note = getItem(position)
-        with(holder) {
+        holder.apply {
             binding.noteTitle.text = note.title
             binding.noteTime.text = note.time
             binding.noteLocation.text = note.location
-            onCoinClickListener?.invoke(note)
+        }
+        holder.itemView.setOnClickListener {
+            onNoteClickListener?.invoke(note)
         }
     }
 
