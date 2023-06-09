@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.like_magic.notes.R
 import com.like_magic.notes.databinding.FragmentListNotesBinding
 import com.like_magic.notes.domen.entity.NoteEntity
@@ -32,10 +34,12 @@ class ListNotesFragment : MvpAppCompatFragment(), AppViews.ListNotesView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.notesRv.adapter = notesAdapter
+        val recyclerView = binding.notesRv
+        recyclerView.adapter = notesAdapter
         presenter.getListNotes()
         setupFab()
-        setupItemListener()
+        setupItemClickListener()
+        setupSwipeListener(recyclerView)
     }
 
     override fun showListNotes(list: List<NoteEntity>) {
@@ -48,7 +52,7 @@ class ListNotesFragment : MvpAppCompatFragment(), AppViews.ListNotesView {
         }
     }
 
-    private fun setupItemListener(){
+    private fun setupItemClickListener(){
         notesAdapter.onNoteClickListener = {note->
             launchNoteFragment(MODE_EDIT, note)
         }
@@ -65,6 +69,29 @@ class ListNotesFragment : MvpAppCompatFragment(), AppViews.ListNotesView {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun setupSwipeListener(rvShopList: RecyclerView) {
+        val callback = object : ItemTouchHelper.SimpleCallback(
+            0,
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        ) {
+
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val item = notesAdapter.currentList[viewHolder.adapterPosition]
+                presenter.deleteNote(item.id)
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(callback)
+        itemTouchHelper.attachToRecyclerView(rvShopList)
     }
 
 }

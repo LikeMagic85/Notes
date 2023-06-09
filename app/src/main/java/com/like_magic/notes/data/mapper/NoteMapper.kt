@@ -6,7 +6,7 @@ import com.like_magic.notes.domen.entity.NoteEntity
 
 class NoteMapper {
 
-    fun mapDbModelToEntity(noteDbModel: NoteDbModel):NoteEntity{
+    private fun mapDbModelToEntity(noteDbModel: NoteDbModel):NoteEntity{
         return NoteEntity(
             id = noteDbModel.id,
             title = noteDbModel.title,

@@ -7,4 +7,5 @@
     <string name="note_description_hint_text">Description</string>
     <string name="save_note_btn_text">Save note</string>
     <string name="delete_note_text">Delete note</string>
+    <string name="error_text">Please, set the title</string>
 </resources>

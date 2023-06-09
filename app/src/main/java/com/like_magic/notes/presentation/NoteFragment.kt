@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.like_magic.notes.R
 import com.like_magic.notes.databinding.FragmentNoteBinding
 import com.like_magic.notes.domen.entity.NoteEntity
+import com.like_magic.notes.domen.entity.NoteEntity.Companion.UNCONFINED_ID
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 
@@ -32,12 +34,27 @@ class NoteFragment : MvpAppCompatFragment(), AppViews.NoteView {
         setupAppBar(args.first, args.second)
     }
 
-    override  fun setRightScreenMode(mode: String, note: NoteEntity?) {
+    override fun setRightScreenMode(mode: String, note: NoteEntity?) {
         when (mode) {
-            MODE_ADD -> {addMode()}
-            MODE_EDIT -> {editMode(note)}
+            MODE_ADD -> {
+                addMode()
+            }
+
+            MODE_EDIT -> {
+                editMode(note)
+            }
+
             else -> {
                 throw RuntimeException("unknown screen mode")
+            }
+        }
+    }
+
+    override fun showError(isError: Boolean) {
+        if (isError) {
+            binding.titleTextInputLayout.apply {
+                isErrorEnabled = true
+                error = context.getString(R.string.error_text)
             }
         }
     }
@@ -50,24 +67,17 @@ class NoteFragment : MvpAppCompatFragment(), AppViews.NoteView {
                 title = binding.titleTextInput.text.toString(),
                 description = binding.descriptionTextInput.text.toString()
             )
-            newNote?.let { note ->
-                presenter.insertNote(note)
+            newNote?.let {
+                presenter.insertNote(it.title, it.description, it.id)
             }
-            requireActivity().supportFragmentManager.popBackStack()
         }
     }
 
     private fun addMode() {
         binding.saveNoteBtn.setOnClickListener {
-            val newNote = NoteEntity(
-                title = binding.titleTextInput.text.toString(),
-                description = binding.descriptionTextInput.text.toString(),
-                location = "Minsk",
-                time = "14:00",
-                id = 0
-            )
-            presenter.insertNote(newNote)
-            requireActivity().supportFragmentManager.popBackStack()
+            val title = binding.titleTextInput.text.toString()
+            val description = binding.descriptionTextInput.text.toString()
+            presenter.insertNote(title, description, UNCONFINED_ID)
         }
     }
 
@@ -76,8 +86,19 @@ class NoteFragment : MvpAppCompatFragment(), AppViews.NoteView {
             MODE_ADD -> {
                 binding.topAppBar.title = "Add new note"
             }
+
             MODE_EDIT -> {
                 binding.topAppBar.title = "Edit note id: ${note?.id.toString()}"
+                binding.topAppBar.menu.findItem(R.id.del_option).isVisible = true
+                binding.topAppBar.setOnMenuItemClickListener {item ->
+                    when(item.itemId){
+                        R.id.del_option -> {
+                            note?.id?.let { id -> presenter.deleteNote(id) }
+                            true
+                        }
+                        else -> false
+                    }
+                }
             }
         }
         binding.topAppBar.setNavigationOnClickListener {
@@ -85,6 +106,9 @@ class NoteFragment : MvpAppCompatFragment(), AppViews.NoteView {
         }
     }
 
+    override fun closeScreen() {
+        requireActivity().supportFragmentManager.popBackStack()
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

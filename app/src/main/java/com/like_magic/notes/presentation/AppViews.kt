@@ -16,6 +16,9 @@ interface AppViews {
     interface NoteView : MvpView {
 
         fun setRightScreenMode(mode: String, note: NoteEntity?)
+        fun showError(isError:Boolean)
+
+        fun closeScreen()
     }
 }
 

@@ -34,7 +34,9 @@ class NotesRepositoryImpl(application: Application) : NotesRepository {
     }
 
     override fun deleteNote(noteId: Int) {
-        TODO("Not yet implemented")
+        Completable.fromCallable {
+            notesDao.deleteNote(noteId)
+        }.subscribeOn(Schedulers.io()).subscribe()
     }
 
 }

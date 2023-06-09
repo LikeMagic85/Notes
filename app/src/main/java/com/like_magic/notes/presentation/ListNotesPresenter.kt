@@ -2,6 +2,7 @@ package com.like_magic.notes.presentation
 
 import android.app.Application
 import com.like_magic.notes.data.NotesRepositoryImpl
+import com.like_magic.notes.domen.usecases.DeleteNoteUseCase
 import com.like_magic.notes.domen.usecases.LoadListNotesUseCase
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -10,8 +11,8 @@ import moxy.MvpPresenter
 class ListNotesPresenter(application: Application):MvpPresenter<AppViews.ListNotesView>() {
 
     private val repository = NotesRepositoryImpl(application)
-
     private val loadListNotesUseCase = LoadListNotesUseCase(repository)
+    private val deleteNoteUseCase = DeleteNoteUseCase(repository)
 
 
     fun getListNotes(){
@@ -22,6 +23,10 @@ class ListNotesPresenter(application: Application):MvpPresenter<AppViews.ListNot
                 viewState.showListNotes(it)
             }
         compositeDisposable.add(disposable)
+    }
+
+    fun deleteNote(id:Int){
+        deleteNoteUseCase(id)
     }
 
 }

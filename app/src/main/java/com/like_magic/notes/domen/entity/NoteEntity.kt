@@ -5,9 +5,14 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class NoteEntity(
-    val id: Int,
+    val id: Int = UNCONFINED_ID,
     val title:String,
     val description:String,
     val time:String,
     val location:String
-):Parcelable
+):Parcelable {
+    companion object {
+        const val UNCONFINED_ID = 0
+    }
+}
+
