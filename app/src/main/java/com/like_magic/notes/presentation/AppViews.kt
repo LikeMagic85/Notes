@@ -19,6 +19,8 @@ interface AppViews {
         fun showError(isError:Boolean)
 
         fun closeScreen()
+
+        fun isLoading(state:Boolean)
     }
 }
 

@@ -1,13 +1,22 @@
 package com.like_magic.notes.presentation
 
+import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.core.view.isVisible
 import com.like_magic.notes.R
 import com.like_magic.notes.databinding.FragmentNoteBinding
 import com.like_magic.notes.domen.entity.NoteEntity
 import com.like_magic.notes.domen.entity.NoteEntity.Companion.UNCONFINED_ID
+import com.like_magic.notes.domen.entity.NoteEntity.Companion.UNCONFINED_LOCATION
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 
@@ -17,6 +26,18 @@ class NoteFragment : MvpAppCompatFragment(), AppViews.NoteView {
     private val binding: FragmentNoteBinding
         get() = _binding ?: throw RuntimeException("FragmentNoteBinding is null")
     private val presenter by moxyPresenter { NotePresenter(requireActivity().application) }
+    private val permReqLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            val granted = permissions.entries.all {
+                it.value
+            }
+            if (granted) {
+                val title = binding.titleTextInput.text.toString()
+                val description = binding.descriptionTextInput.text.toString()
+                presenter.insertNote(title, description, UNCONFINED_ID, UNCONFINED_LOCATION)
+            }
+        }
+
 
 
     override fun onCreateView(
@@ -63,21 +84,31 @@ class NoteFragment : MvpAppCompatFragment(), AppViews.NoteView {
         binding.titleTextInput.setText(note?.title)
         binding.descriptionTextInput.setText(note?.description)
         binding.saveNoteBtn.setOnClickListener {
+            isLoading(true)
+            hideKeyboardFrom(requireContext(), it)
             val newNote = note?.copy(
                 title = binding.titleTextInput.text.toString(),
                 description = binding.descriptionTextInput.text.toString()
             )
             newNote?.let {
-                presenter.insertNote(it.title, it.description, it.id)
+                presenter.insertNote(it.title, it.description, it.id, it.location)
             }
         }
     }
 
     private fun addMode() {
         binding.saveNoteBtn.setOnClickListener {
+            isLoading(true)
+            hideKeyboardFrom(requireContext(), it)
             val title = binding.titleTextInput.text.toString()
             val description = binding.descriptionTextInput.text.toString()
-            presenter.insertNote(title, description, UNCONFINED_ID)
+            if(hasPermissions(requireContext(), PERMISSIONS)){
+                presenter.insertNote(title, description, UNCONFINED_ID, UNCONFINED_LOCATION)
+            }else{
+                permReqLauncher.launch(
+                    PERMISSIONS
+                )
+            }
         }
     }
 
@@ -110,6 +141,14 @@ class NoteFragment : MvpAppCompatFragment(), AppViews.NoteView {
         requireActivity().supportFragmentManager.popBackStack()
     }
 
+    override fun isLoading(state: Boolean) {
+        binding.loadingLayout.isVisible = state
+    }
+
+    private fun hasPermissions(context: Context, permissions: Array<String>): Boolean = permissions.all {
+        ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -127,12 +166,23 @@ class NoteFragment : MvpAppCompatFragment(), AppViews.NoteView {
         const val MODE_ADD = "mode_add"
         private const val NOTE = "note"
 
+        var PERMISSIONS = arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+
         fun newInstance(mode: String, noteEntity: NoteEntity? = null) = NoteFragment().apply {
             arguments = Bundle().apply {
                 putString(SCREEN_MODE, mode)
                 putParcelable(NOTE, noteEntity)
             }
         }
+    }
+
+
+    private fun hideKeyboardFrom(context: Context, view: View) {
+        val imm = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
 }

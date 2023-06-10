@@ -1,10 +1,13 @@
 package com.like_magic.notes.data.mapper
 
 
+import android.app.Application
+import android.location.Geocoder
+import android.location.Location
 import com.like_magic.notes.data.database.NoteDbModel
 import com.like_magic.notes.domen.entity.NoteEntity
 
-class NoteMapper {
+class NoteMapper(private val application: Application) {
 
     private fun mapDbModelToEntity(noteDbModel: NoteDbModel):NoteEntity{
         return NoteEntity(
@@ -33,5 +36,12 @@ class NoteMapper {
             location = noteEntity.location
         )
     }
+
+    fun mapLocationToCity(location:Location):String? {
+        val geocoder = Geocoder(application)
+        return geocoder.getFromLocation(location.latitude, location.longitude, 1)?.get(0)?.subAdminArea
+
+    }
+
 
 }

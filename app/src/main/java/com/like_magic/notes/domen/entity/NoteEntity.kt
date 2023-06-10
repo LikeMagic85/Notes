@@ -9,10 +9,11 @@ data class NoteEntity(
     val title:String,
     val description:String,
     val time:String,
-    val location:String
+    val location:String = UNCONFINED_LOCATION
 ):Parcelable {
     companion object {
         const val UNCONFINED_ID = 0
+        const val UNCONFINED_LOCATION = ""
     }
 }
 
