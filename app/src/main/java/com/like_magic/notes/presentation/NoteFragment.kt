@@ -12,20 +12,30 @@ import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
+import com.like_magic.notes.NotesApp
 import com.like_magic.notes.R
 import com.like_magic.notes.databinding.FragmentNoteBinding
-import com.like_magic.notes.domen.entity.NoteEntity
-import com.like_magic.notes.domen.entity.NoteEntity.Companion.UNCONFINED_ID
-import com.like_magic.notes.domen.entity.NoteEntity.Companion.UNCONFINED_LOCATION
+import com.like_magic.notes.domain.entity.NoteEntity
+import com.like_magic.notes.domain.entity.NoteEntity.Companion.UNCONFINED_ID
+import com.like_magic.notes.domain.entity.NoteEntity.Companion.UNCONFINED_LOCATION
 import moxy.MvpAppCompatFragment
-import moxy.ktx.moxyPresenter
+import moxy.presenter.InjectPresenter
+import moxy.presenter.ProvidePresenter
+import javax.inject.Inject
 
 class NoteFragment : MvpAppCompatFragment(), AppViews.NoteView {
 
     private var _binding: FragmentNoteBinding? = null
     private val binding: FragmentNoteBinding
         get() = _binding ?: throw RuntimeException("FragmentNoteBinding is null")
-    private val presenter by moxyPresenter { NotePresenter(requireActivity().application) }
+    @InjectPresenter
+    lateinit var  presenter:NotePresenter
+    @Inject
+    lateinit var daggerPresenter: NotePresenter
+    @ProvidePresenter
+    fun providePresenter(): NotePresenter {
+        return daggerPresenter
+    }
     private val permReqLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             val granted = permissions.entries.all {
@@ -37,7 +47,14 @@ class NoteFragment : MvpAppCompatFragment(), AppViews.NoteView {
                 presenter.insertNote(title, description, UNCONFINED_ID, UNCONFINED_LOCATION)
             }
         }
+    private val component by lazy {
+        (requireActivity().application as NotesApp).component
+    }
 
+    override fun onAttach(context: Context) {
+        component.inject(this)
+        super.onAttach(context)
+    }
 
 
     override fun onCreateView(
@@ -60,11 +77,9 @@ class NoteFragment : MvpAppCompatFragment(), AppViews.NoteView {
             MODE_ADD -> {
                 addMode()
             }
-
             MODE_EDIT -> {
                 editMode(note)
             }
-
             else -> {
                 throw RuntimeException("unknown screen mode")
             }
@@ -84,21 +99,19 @@ class NoteFragment : MvpAppCompatFragment(), AppViews.NoteView {
         binding.titleTextInput.setText(note?.title)
         binding.descriptionTextInput.setText(note?.description)
         binding.saveNoteBtn.setOnClickListener {
-            isLoading(true)
             hideKeyboardFrom(requireContext(), it)
             val newNote = note?.copy(
                 title = binding.titleTextInput.text.toString(),
                 description = binding.descriptionTextInput.text.toString()
             )
-            newNote?.let {
-                presenter.insertNote(it.title, it.description, it.id, it.location)
+            newNote?.let {note ->
+                presenter.insertNote(note.title, note.description, note.id, note.location)
             }
         }
     }
 
     private fun addMode() {
         binding.saveNoteBtn.setOnClickListener {
-            isLoading(true)
             hideKeyboardFrom(requireContext(), it)
             val title = binding.titleTextInput.text.toString()
             val description = binding.descriptionTextInput.text.toString()

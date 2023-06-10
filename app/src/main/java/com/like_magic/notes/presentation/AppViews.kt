@@ -1,6 +1,6 @@
 package com.like_magic.notes.presentation
 
-import com.like_magic.notes.domen.entity.NoteEntity
+import com.like_magic.notes.domain.entity.NoteEntity
 import moxy.MvpView
 import moxy.viewstate.strategy.AddToEndSingleStrategy
 import moxy.viewstate.strategy.StateStrategyType

@@ -1,31 +1,31 @@
 package com.like_magic.notes.presentation
 
-import android.app.Application
-import com.like_magic.notes.data.NotesRepositoryImpl
-import com.like_magic.notes.domen.usecases.DeleteNoteUseCase
-import com.like_magic.notes.domen.usecases.LoadListNotesUseCase
+import com.like_magic.notes.domain.usecases.DeleteNoteUseCase
+import com.like_magic.notes.domain.usecases.LoadListNotesUseCase
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import moxy.InjectViewState
 import moxy.MvpPresenter
+import javax.inject.Inject
 
-class ListNotesPresenter(application: Application):MvpPresenter<AppViews.ListNotesView>() {
+@InjectViewState
+class ListNotesPresenter @Inject constructor(
+    val loadListNotesUseCase: LoadListNotesUseCase,
+    val deleteNoteUseCase: DeleteNoteUseCase
+) : MvpPresenter<AppViews.ListNotesView>() {
 
-    private val repository = NotesRepositoryImpl(application)
-    private val loadListNotesUseCase = LoadListNotesUseCase(repository)
-    private val deleteNoteUseCase = DeleteNoteUseCase(repository)
 
-
-    fun getListNotes(){
+    fun getListNotes() {
         val compositeDisposable = CompositeDisposable()
         val disposable = loadListNotesUseCase()
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe{
+            .subscribe {
                 viewState.showListNotes(it)
             }
         compositeDisposable.add(disposable)
     }
 
-    fun deleteNote(id:Int){
+    fun deleteNote(id: Int) {
         deleteNoteUseCase(id)
     }
 

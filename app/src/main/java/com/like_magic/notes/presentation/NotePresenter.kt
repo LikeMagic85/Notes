@@ -1,24 +1,24 @@
 package com.like_magic.notes.presentation
 
-import android.app.Application
-import com.like_magic.notes.data.NotesRepositoryImpl
-import com.like_magic.notes.domen.entity.NoteEntity
-import com.like_magic.notes.domen.entity.NoteEntity.Companion.UNCONFINED_LOCATION
-import com.like_magic.notes.domen.usecases.DeleteNoteUseCase
-import com.like_magic.notes.domen.usecases.GetLocationUseCase
-import com.like_magic.notes.domen.usecases.InsertNoteUseCase
+import com.like_magic.notes.domain.entity.NoteEntity
+import com.like_magic.notes.domain.entity.NoteEntity.Companion.UNCONFINED_LOCATION
+import com.like_magic.notes.domain.usecases.DeleteNoteUseCase
+import com.like_magic.notes.domain.usecases.GetLocationUseCase
+import com.like_magic.notes.domain.usecases.InsertNoteUseCase
 import io.reactivex.disposables.CompositeDisposable
+import moxy.InjectViewState
 import moxy.MvpPresenter
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import javax.inject.Inject
+@InjectViewState
+class NotePresenter @Inject constructor(
+    private val insertNoteUseCase:InsertNoteUseCase,
+    private val deleteNoteUseCase: DeleteNoteUseCase,
+    private val getLocationUseCase: GetLocationUseCase
 
-class NotePresenter(application: Application): MvpPresenter<AppViews.NoteView>() {
-
-    private val repository = NotesRepositoryImpl(application)
-    private val insertNoteUseCase = InsertNoteUseCase(repository)
-    private val deleteNoteUseCase = DeleteNoteUseCase(repository)
-    private val getLocationUseCase = GetLocationUseCase(repository)
+    ): MvpPresenter<AppViews.NoteView>() {
 
     fun setScreenMode(mode:String, note: NoteEntity?){
         viewState.setRightScreenMode(mode, note)
@@ -26,6 +26,7 @@ class NotePresenter(application: Application): MvpPresenter<AppViews.NoteView>()
 
     fun insertNote(title:String, description:String, id:Int, location:String){
         if(title.isNotEmpty()){
+            viewState.isLoading(true)
             if(location != UNCONFINED_LOCATION){
                 val note = NoteEntity(
                     title = title,

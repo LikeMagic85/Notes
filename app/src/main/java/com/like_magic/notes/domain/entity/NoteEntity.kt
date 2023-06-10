@@ -1,4 +1,4 @@
-package com.like_magic.notes.domen.entity
+package com.like_magic.notes.domain.entity
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

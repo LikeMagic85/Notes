@@ -5,9 +5,10 @@ import android.app.Application
 import android.location.Geocoder
 import android.location.Location
 import com.like_magic.notes.data.database.NoteDbModel
-import com.like_magic.notes.domen.entity.NoteEntity
+import com.like_magic.notes.domain.entity.NoteEntity
+import javax.inject.Inject
 
-class NoteMapper(private val application: Application) {
+class NoteMapper @Inject constructor(private val application: Application) {
 
     private fun mapDbModelToEntity(noteDbModel: NoteDbModel):NoteEntity{
         return NoteEntity(

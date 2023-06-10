@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.like_magic.notes.databinding.ItemNotesListBinding
-import com.like_magic.notes.domen.entity.NoteEntity
+import com.like_magic.notes.domain.entity.NoteEntity
 
 class ListNotesAdapter() :
     ListAdapter<NoteEntity, ListNotesAdapter.NoteViewHolder>(NoteDiffCallback()) {

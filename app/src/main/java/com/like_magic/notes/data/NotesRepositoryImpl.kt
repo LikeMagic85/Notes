@@ -8,20 +8,23 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.CancellationTokenSource
-import com.like_magic.notes.data.database.AppDatabase
+import com.like_magic.notes.data.database.NotesDao
 import com.like_magic.notes.data.mapper.NoteMapper
-import com.like_magic.notes.domen.NotesRepository
-import com.like_magic.notes.domen.entity.NoteEntity
+import com.like_magic.notes.domain.NotesRepository
+import com.like_magic.notes.domain.entity.NoteEntity
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
 
-class NotesRepositoryImpl(private val application: Application) : NotesRepository {
+class NotesRepositoryImpl @Inject constructor(
+    private val application: Application,
+    private val mapper: NoteMapper,
+    private val notesDao:NotesDao,
+) : NotesRepository {
 
-    private val notesDao = AppDatabase.getInstance(application).notesDao()
-    private val mapper = NoteMapper(application)
     private lateinit var mFusedLocationClient: FusedLocationProviderClient
     override fun getNotesList(): Observable<List<NoteEntity>> {
         return notesDao.getAllNotes()

@@ -1,6 +1,6 @@
-package com.like_magic.notes.domen
+package com.like_magic.notes.domain
 
-import com.like_magic.notes.domen.entity.NoteEntity
+import com.like_magic.notes.domain.entity.NoteEntity
 import io.reactivex.Observable
 import io.reactivex.Single
 
